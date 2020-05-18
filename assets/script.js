@@ -147,7 +147,7 @@ function spotifyPull(artistResult) {
     "user-top-read"
   ];
 
-  if (!_token) {
+  if (_token== true) {
     window.location = authEndpoint + "?client_id=" + clientID + "&redirect_uri=" + redirectURI + "&scope=" + scope.join("%20") + "&response_type=token&show_dialog=true";
   }
   var queryURL = "https://api.spotify.com/v1/search?q=" + artistResult + "&type=artist";
