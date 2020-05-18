@@ -1,4 +1,3 @@
-
 let discoverBtn = document.getElementById("discover");
 let apikey = "368598-musicbuf-RZ4G3NI6";
 let addBtn = document.getElementById("add");
@@ -17,7 +16,7 @@ $("#discover").on("click", function (event) {
   $("#artist-list").empty();
   event.preventDefault();
   var artist = $("#newItem").val();
-  getArtist(artist)
+  getArtist(artist);
   $("#newItem").val("");
 });
 
@@ -33,28 +32,28 @@ $("body").on("click", ".sim-artist", function (event) {
   getArtist(artist);
 });
 
-
 //skip button click, checks if near end of array, if so will loop to beginning
 $("#skip").on("click", function () {
   for (var i = 0; i < currentSongPlaylist.length; i++) {
     if (currentSongID == currentSongPlaylist[i].id) {
       if (currentSongPlaylist.length > i + 1) {
-        iFrameW(currentSongPlaylist[i + 1].id)
+        iFrameW(currentSongPlaylist[i + 1].id);
         currentSongID = currentSongPlaylist[i + 1].id;
       } else {
-        iFrameW(currentSongPlaylist[0].id)
+        iFrameW(currentSongPlaylist[0].id);
         currentSongID = currentSongPlaylist[0].id;
       }
       break;
     }
   }
-})
+});
 
 //saves song to local storage array and updates favArtistList
 function addArtist(newArtistName) {
-  var favArtistList = JSON.parse(window.localStorage.getItem("favArtistList")) || [];
+  var favArtistList =
+    JSON.parse(window.localStorage.getItem("favArtistList")) || [];
   var newArtist = {
-    artistName: newArtistName
+    artistName: newArtistName,
   };
   var isRepeated = false;
   for (var i = 0; i < favArtistList.length; i++) {
@@ -81,7 +80,11 @@ function getArtist(artist) {
     url: queryURL,
     method: "GET",
   }).done(function (response) {
-    if (response.Similar.Results.length == 0 || artist == "" || artist == null) {
+    if (
+      response.Similar.Results.length == 0 ||
+      artist == "" ||
+      artist == null
+    ) {
     } else {
       $("#artist-list").empty();
       for (let i = 0; i < response.Similar.Results.length; i++) {
@@ -96,7 +99,8 @@ function getArtist(artist) {
 
 //retrieves favArtistList from local storage and renders
 function renderFavArtistList() {
-  var favArtistList = JSON.parse(window.localStorage.getItem("favArtistList")) || [];
+  var favArtistList =
+    JSON.parse(window.localStorage.getItem("favArtistList")) || [];
   var artistsEl = $("#fav-artist-list");
   if (favArtistList !== null) {
     artistsEl.empty();
@@ -119,55 +123,69 @@ function iFrameW(URI) {
     height: "80",
     frameborder: "0",
     allowtransparency: "true",
-    allow: "encrypted-media"
-  })
-  $("#widget").append(iFrameW)
-};
+    allow: "encrypted-media",
+  });
+  $("#widget").append(iFrameW);
+}
 
 //authorizes user account with spotify, sends artist and receives top tracks
 function spotifyPull(artistResult) {
   const hash = window.location.hash
     .substring(1)
-    .split('&')
+    .split("&")
     .reduce(function (initial, item) {
       if (item) {
-        var parts = item.split('=');
-        initial[parts[0]] = decodeURIComponent(parts[1])
+        var parts = item.split("=");
+        initial[parts[0]] = decodeURIComponent(parts[1]);
       }
       return initial;
     }, {});
-  window.location.hash = '';
+  window.location.hash = "";
 
   let _token = hash.access_token;
   var authEndpoint = "https://accounts.spotify.com/authorize";
   var clientID = "87da17f3514b4a86854820f3d7804bb0";
   // Set URI to Live Site
   var redirectURI = "https://huicho510.github.io/Music-Buffet/";
-  var scope = [
-    "user-top-read"
-  ];
+  var scope = ["user-top-read"];
 
-  if (_token) {
-    window.location = authEndpoint + "?client_id=" + clientID + "&redirect_uri=" + redirectURI + "&scope=" + scope.join("%20") + "&response_type=token&show_dialog=true";
+  if (!_token) {
+    window.location =
+      authEndpoint +
+      "?client_id=" +
+      clientID +
+      "&redirect_uri=" +
+      redirectURI +
+      "&scope=" +
+      scope.join("%20") +
+      "&response_type=token&show_dialog=true";
   }
-  var queryURL = "https://api.spotify.com/v1/search?q=" + artistResult + "&type=artist";
+  var queryURL =
+    "https://api.spotify.com/v1/search?q=" + artistResult + "&type=artist";
 
   $.ajax({
     url: queryURL,
     method: "GET",
-    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + _token); },
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("Authorization", "Bearer " + _token);
+    },
   }).then(function (response) {
     var artistID = response.artists.items[0].id;
-    var queryURL = "https://api.spotify.com/v1/artists/" + artistID + "/top-tracks?country=US";
+    var queryURL =
+      "https://api.spotify.com/v1/artists/" +
+      artistID +
+      "/top-tracks?country=US";
     $.ajax({
       url: queryURL,
       method: "GET",
-      beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + _token); },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("Authorization", "Bearer " + _token);
+      },
     }).then(function (response) {
       currentSongPlaylist = response.tracks;
-      var songID = response.tracks[0].id
+      var songID = response.tracks[0].id;
       currentSongID = songID;
-      iFrameW(songID)
+      iFrameW(songID);
     });
   });
 }
