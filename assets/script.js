@@ -16,7 +16,7 @@ $("#discover").on("click", function (event) {
   $("#artist-list").empty();
   event.preventDefault();
   var artist = $("#newItem").val();
-  getArtist(artist)
+  getArtist(artist);
   $("#newItem").val("");
 });
 
@@ -32,30 +32,28 @@ $("body").on("click", ".sim-artist", function (event) {
   getArtist(artist);
 });
 
-
-
 //skip button click, checks if near end of array, if so will loop to beginning
-
 $("#skip").on("click", function () {
   for (var i = 0; i < currentSongPlaylist.length; i++) {
     if (currentSongID == currentSongPlaylist[i].id) {
       if (currentSongPlaylist.length > i + 1) {
-        iFrameW(currentSongPlaylist[i + 1].id)
+        iFrameW(currentSongPlaylist[i + 1].id);
         currentSongID = currentSongPlaylist[i + 1].id;
       } else {
-        iFrameW(currentSongPlaylist[0].id)
+        iFrameW(currentSongPlaylist[0].id);
         currentSongID = currentSongPlaylist[0].id;
       }
       break;
     }
   }
-})
+});
 
 //saves song to local storage array and updates favArtistList
 function addArtist(newArtistName) {
-  var favArtistList = JSON.parse(window.localStorage.getItem("favArtistList")) || [];
+  var favArtistList =
+    JSON.parse(window.localStorage.getItem("favArtistList")) || [];
   var newArtist = {
-    artistName: newArtistName
+    artistName: newArtistName,
   };
   var isRepeated = false;
   for (var i = 0; i < favArtistList.length; i++) {
@@ -82,48 +80,27 @@ function getArtist(artist) {
     url: queryURL,
     method: "GET",
   }).done(function (response) {
-    if (response.Similar.Results.length == 0 || artist == "" || artist == null) {
+    if (
+      response.Similar.Results.length == 0 ||
+      artist == "" ||
+      artist == null
+    ) {
     } else {
-      var simArtistList = JSON.parse(window.localStorage.getItem("simArtistList")) || [];
-      simArtistList.empty();
-      for(var i=0; i<response.Similar.Results.length; i++) {
-        simArtistList.push(response.Similar.Results[i].Name)   
+      $("#artist-list").empty();
+      for (let i = 0; i < response.Similar.Results.length; i++) {
+        $("#artist-list").append(
+          "<h5 class = sim-artist>" + response.Similar.Results[i].Name + "</h5>"
+        );
       }
-      window.localStorage.setItem("simArtistList", JSON.stringify(simArtistList));
-      renderSimArtistList();
-      // $("#artist-list").empty();
-      // for (let i = 0; i < response.Similar.Results.length; i++) {
-      //   $("#artist-list").append(
-      //     "<li class = sim-artist>" + response.Similar.Results[i].Name + "</li>"
-      //   );
-      // }
       addArtist(artist);
     }
   });
 }
 
-// retrieves simArtistList from local storage and renders
-function renderSimArtistList() {
-  var simArtistList = JSON.parse(window.localStorage.getItem("simArtistList")) || [];
-  var artistsEl = $("artist-list");
-
-  if (simArtistList !== null) {
-    artistsEl.empty();
-    var ulArtistsEl = $("<ul>");
-    for (var i = 0; i < simArtistList.length; i++) {
-      var liArtistsEl = $("<li>").addClass("sim-artist");
-      liArtistsEl.text(simArtistList[i].artistName);
-      ulArtistsEl.append(liArtistsEl);
-    }
-    artistsEl.append(ulArtistsEl);
-  }
-}
-
-
 //retrieves favArtistList from local storage and renders
-
 function renderFavArtistList() {
-  var favArtistList = JSON.parse(window.localStorage.getItem("favArtistList")) || [];
+  var favArtistList =
+    JSON.parse(window.localStorage.getItem("favArtistList")) || [];
   var artistsEl = $("#fav-artist-list");
   if (favArtistList !== null) {
     artistsEl.empty();
@@ -146,24 +123,24 @@ function iFrameW(URI) {
     height: "80",
     frameborder: "0",
     allowtransparency: "true",
-    allow: "encrypted-media"
-  })
-  $("#widget").append(iFrameW)
-};
+    allow: "encrypted-media",
+  });
+  $("#widget").append(iFrameW);
+}
 
 //authorizes user account with spotify, sends artist and receives top tracks
 function spotifyPull(artistResult) {
   const hash = window.location.hash
     .substring(1)
-    .split('&')
+    .split("&")
     .reduce(function (initial, item) {
       if (item) {
-        var parts = item.split('=');
-        initial[parts[0]] = decodeURIComponent(parts[1])
+        var parts = item.split("=");
+        initial[parts[0]] = decodeURIComponent(parts[1]);
       }
       return initial;
     }, {});
-  window.location.hash = '';
+  window.location.hash = "";
 
   let _token = hash.access_token;
   var authEndpoint = "https://accounts.spotify.com/authorize";
